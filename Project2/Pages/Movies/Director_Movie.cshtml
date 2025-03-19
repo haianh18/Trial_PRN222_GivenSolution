@@ -1,0 +1,178 @@
+﻿@page
+@model Project2.Pages.Movies.Director_MovieModel
+@{
+    ViewData["Title"] = "List of movies";
+}
+
+    
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <style>
+        /* Reset và Styles cơ bản */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        /* Layout hai cột */
+        .container {
+            width: 100%;
+            display: flex;
+            gap: 20px;
+        }
+
+        .directors-column {
+            flex: 1;
+            max-width: 250px;
+        }
+
+        .movies-column {
+            flex: 3;
+        }
+
+        /* Style cho bảng */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            font-weight: normal;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+
+
+
+        /* Responsive */
+        @@media screen and (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .directors-column, .movies-column {
+                max-width: 100%;
+            }
+
+            .table-responsive {
+                overflow-x: auto;
+            }
+        }
+
+        /* Highlight cho director được chọn */
+        .selected-director {
+            font-weight: bold;
+            /* color: #ff6600; */
+            background-color: #f0f0f0;
+        }
+    </style>
+
+</head>
+
+<body>
+<h1>List of movies</h1>
+
+<div class="container">
+    <!-- Directors Table (Left side) -->
+    <div class="directors-column">
+        <table>
+            <thead>
+                <tr>
+                    <th>Directors</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var director in Model.Directors)
+                {
+                    <tr>
+                        <td class="@(Model.SelectedDirectorId == director.Id ? "selected-director" : "")">
+
+                            <a href="/Movies/Director_Movie?id=@director.Id">
+                                @director.FullName
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Movies Table (Right side) -->
+    <div class="movies-column">
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>ReleaseDate</th>
+                        <th>Description</th>
+                        <th>Language</th>
+                        <th>Director</th>
+                        <th>Producer</th>
+                        <th>Stars</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var movie in Model.Movies)
+                    {
+                        <tr>
+                            <td>@movie.Title</td>
+                            <td>@(movie.ReleaseDate.HasValue ? movie.ReleaseDate.Value.ToString("MM/dd/yyyy") : "")</td>
+                            <td>@movie.Description</td>
+                            <td>@movie.Language</td>
+                            <td>@(movie.Director != null ? $"{movie.Director.FullName}" : "")</td>
+                            <td>@(movie.Producer != null ? movie.Producer.Name : "")</td>
+                            <td>
+                                @if (movie.Stars != null && movie.Stars.Any())
+                                {
+										@foreach (var star in movie.Stars)
+										{
+											<div>@star.FullName</div>
+										}
+                                }
+                            </td>
+                            <td>
+                                <a id="deleteButton" asp-page="Director_Movie" asp-page-handler="Delete" asp-route-movieId="@movie.Id" asp-route-directorId="@Model.SelectedDirectorId">
+									Delete
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+    <script src="~/lib/microsoft-signalr/signalr.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+</body>
+</html>
