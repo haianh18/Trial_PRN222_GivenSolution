@@ -1,0 +1,224 @@
+﻿@page
+@model Project2.Pages.Movies.FilterModel
+@{
+    ViewData["Title"] = "Filter Movies";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <style>
+        /* Reset and basic styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        /* Filter form */
+        .filter-form {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .filter-select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+
+        .filter-button {
+            padding: 8px 15px;
+            background-color: #4682B4;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-top: 22px;
+        }
+
+            .filter-button:hover {
+                background-color: #3a6d96;
+            }
+
+        /* Style for table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            font-weight: normal;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        
+        /* Navigation */
+        .nav-links {
+            margin-bottom: 20px;
+        }
+
+            .nav-links a {
+                margin-right: 15px;
+                text-decoration: none;
+                color: #4682B4;
+            }
+
+                .nav-links a:hover {
+                    text-decoration: underline;
+                }
+    </style>
+</head>
+
+<body>
+    <h1>Filter Movies</h1>
+
+    <div class="nav-links">
+        <a href="/Movies/Search">Search</a>
+        <a href="/Movies/Filter">Filter</a>
+        <a href="/Movies/Director_Movie">By Director</a>
+    </div>
+
+    <div class="filter-form">
+        <form method="get">
+            <div class="filter-group">
+                <label class="filter-label" for="directorId">Director:</label>
+                <select name="directorId" id="directorId" class="filter-select">
+                    <option value="">-- All Directors --</option>
+                    @foreach (var director in Model.Directors)
+                    {
+                        <option value="@director.Id" selected="@(Model.DirectorId == director.Id)">@director.FullName</option>
+                    }
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label class="filter-label" for="starId">Star:</label>
+                <select name="starId" id="starId" class="filter-select">
+                    <option value="">-- All Stars --</option>
+                    @foreach (var star in Model.Stars)
+                    {
+                        <option value="@star.Id" selected="@(Model.StarId == star.Id)">@star.FullName</option>
+                    }
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label class="filter-label" for="genreId">Genre:</label>
+                <select name="genreId" id="genreId" class="filter-select">
+                    <option value="">-- All Genres --</option>
+                    @foreach (var genre in Model.Genres)
+                    {
+                        <option value="@genre.Id" selected="@(Model.GenreId == genre.Id)">@genre.Title</option>
+                    }
+                </select>
+            </div>
+
+            <button type="submit" class="filter-button">Apply Filters</button>
+        </form>
+    </div>
+
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Release Date</th>
+                    <th>Description</th>
+                    <th>Language</th>
+                    <th>Director</th>
+                    <th>Producer</th>
+                    <th>Stars</th>
+                    <th>Genres</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var movie in Model.Movies)
+                {
+                    <tr>
+                        <td>@movie.Title</td>
+                        <td>@(movie.ReleaseDate.HasValue ? movie.ReleaseDate.Value.ToString("MM/dd/yyyy") : "")</td>
+                        <td>@movie.Description</td>
+                        <td>@movie.Language</td>
+                        <td>@(movie.Director != null ? movie.Director.FullName : "")</td>
+                        <td>@(movie.Producer != null ? movie.Producer.Name : "")</td>
+                        <td>
+                            @if (movie.Stars != null && movie.Stars.Any())
+                            {
+                                @foreach (var star in movie.Stars)
+                                {
+                                    <div>@star.FullName</div>
+                                }
+                            }
+                        </td>
+                        <td>
+                            @if (movie.Genres != null && movie.Genres.Any())
+                            {
+                                @foreach (var genre in movie.Genres)
+                                {
+                                    <div>@genre.Title</div>
+                                }
+                            }
+                        </td>
+                        <td>
+                            <a id="deleteButton" asp-page="Filter" asp-page-handler="Delete"
+                               asp-route-movieId="@movie.Id"
+                               asp-route-directorId="@Model.DirectorId"
+                               asp-route-starId="@Model.StarId"
+                               asp-route-genreId="@Model.GenreId">
+                                Delete
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <script src="~/lib/microsoft-signalr/signalr.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+</body>
+</html>

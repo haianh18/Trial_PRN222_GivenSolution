@@ -32,8 +32,10 @@
                VerticalAlignment="Top" />
         <Label Content="Description&#xD;&#xA;"
                HorizontalAlignment="Left"
-               Margin="55,232,0,0"
-               VerticalAlignment="Top" />
+               Margin="55,237,0,0"
+               VerticalAlignment="Top"
+               RenderTransformOrigin="0.515,1.121"
+               Height="32" />
         <TextBox HorizontalAlignment="Left"
                  Margin="152,146,0,0"
                  TextWrapping="Wrap"
